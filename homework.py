@@ -20,7 +20,7 @@ class InfoMessage:
     def get_message(self) -> str:
         return self.MESSAGE.format(**asdict(self))
 
-@dataclass
+@dataclass #у родительского класса получилось применить, я рад))
 class Training:
     action: int
     duration: int
@@ -67,16 +67,18 @@ class Running(Training):
              + self.CALORIES_MEAN_SPEED_SHIFT) * self.weight
             / self.M_IN_KM * self.duration * self.MINS_IN_HR)
 
-
-class SportsWalking(Training):
-    
+#@dataclass
+# а вот тут уже начались проблемы, тк появляется параметр height
+# NameError: name 'height' is not defined
+class SportsWalking(Training): 
+    #height: float
     def __init__(self, action: int, duration: float,
                  weight: float, height: float) -> None:
         super().__init__(action, duration, weight)
         self.height: float = height
 
     """Тренировка: спортивная ходьба."""
-    SEC_IN_HR: float = 3600
+    SEC_IN_HR: float = 3600 #Тут я ввел новую переменную
     CM_IN_M: int = 100
     LEN_STEP: float = 0.65
     CALORIES_WEIGHT_MULTIPLIER: float = 0.035
@@ -91,7 +93,7 @@ class SportsWalking(Training):
         return (
             (self.CALORIES_WEIGHT_MULTIPLIER * self.weight
             + ((self.get_mean_speed() 
-                * round(self.M_IN_KM/self.SEC_IN_HR,3)) ** 2
+                * round(self.M_IN_KM/self.SEC_IN_HR,3)) ** 2 #а тут округлил через round
              / (self.height / self.CM_IN_M))
             * self.CALORIES_SPEED_MULTIPLIER * self.weight)
             * self.duration * self.MINS_IN_HR)
@@ -119,6 +121,12 @@ class Swimming(Training):
             (self.get_mean_speed() + self.CALORIES_CORRECT_KONSTANT)
             * self.CALORIES_SWIM_MULTIPLIER * self.duration * self.weight)
 
+# При попытке вынести словарь за пределы функции,
+# выдает ошибку (TypeError: 'type' object is not subscriptable)
+#TRAINING_NAMES: Dict[type[Training]] = {
+#        'SWM': Swimming,
+#        'RUN': Running,
+#        'WLK': SportsWalking}
 
 def read_package(workout_type: str, data: List[str]) -> Training:
     """Прочитать данные полученные от датчиков."""
